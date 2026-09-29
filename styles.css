@@ -1,0 +1,1314 @@
+/* Status Claus only adds decoration; all page controls remain clickable. */
+.status-claus-game-over {
+  position: fixed;
+  inset: 0;
+  z-index: 2147483646;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+  background: radial-gradient(ellipse at center, rgba(15, 23, 42, 0.65), transparent 65%);
+}
+
+.status-claus-game-over-panel {
+  text-align: center;
+  animation:
+    status-claus-game-over-grow 650ms cubic-bezier(0.16, 1, 0.3, 1) both,
+    status-claus-game-over-hover 1.5s ease-in-out 650ms infinite;
+}
+
+.status-claus-game-over-scores {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 8px 32px;
+  margin: 16px auto 0;
+  padding: 12px 24px;
+  width: fit-content;
+  max-width: 90vw;
+  box-sizing: border-box;
+  border: 2px solid #facc15;
+  border-radius: 16px;
+  background: rgba(30, 27, 75, 0.94);
+  color: #fff;
+  font: 700 clamp(16px, 3vw, 32px)/1.4 system-ui, sans-serif;
+  box-shadow: 0 4px 20px rgba(0, 0, 0, 0.4);
+}
+
+.status-claus-game-over-scores strong { color: #fef08a; }
+
+.status-claus-game-over-title {
+  display: block;
+  max-width: 96vw;
+  font: 1000 clamp(32px, 12vw, 160px)/1.15 system-ui, sans-serif;
+  letter-spacing: -0.04em;
+  text-align: center;
+  white-space: nowrap;
+  color: #facc15;
+  background: linear-gradient(110deg, #ff477e 5%, #ffab40 25%, #fff176 45%, #69f0ae 65%, #40c4ff 85%, #e040fb);
+  background-clip: text;
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  -webkit-text-stroke: 1px rgba(255, 255, 255, 0.9);
+  filter: drop-shadow(0 5px 0 #4c1d95) drop-shadow(0 9px 16px rgba(0, 0, 0, 0.7));
+}
+
+.status-claus-game-over-elf .status-claus-game-over-title,
+.status-claus-game-over-carolers .status-claus-game-over-title {
+  font-size: clamp(28px, 9vw, 128px);
+}
+
+.status-claus-game-over-reason {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 12px;
+  margin: 8px auto 0;
+  padding: 10px 20px;
+  max-width: min(640px, 90vw);
+  box-sizing: border-box;
+  border: 2px solid #f87171;
+  border-radius: 16px;
+  background: rgba(127, 29, 29, 0.94);
+  color: #fff;
+  font: 800 clamp(15px, 2.4vw, 22px)/1.3 system-ui, sans-serif;
+  text-align: left;
+  box-shadow: 0 10px 28px rgba(15, 23, 42, 0.45);
+}
+
+.status-claus-game-over-time .status-claus-game-over-reason {
+  border-color: #facc15;
+  background: rgba(30, 27, 75, 0.94);
+}
+
+.status-claus-game-over-reason-icon {
+  flex: none;
+  font-size: 1.8em;
+  line-height: 1;
+}
+
+@keyframes status-claus-game-over-grow {
+  from { opacity: 0; transform: scale(0.06); }
+  to { opacity: 1; transform: scale(1); }
+}
+
+@keyframes status-claus-game-over-hover {
+  0%, 100% { transform: translateY(0); }
+  50% { transform: translateY(-8px); }
+}
+
+.components-container.one-column.status-claus-tree-host {
+  position: relative !important;
+  overflow: visible !important;
+}
+
+.status-claus-tree-overlay {
+  position: absolute;
+  inset: 0;
+  z-index: 10;
+  width: 100%;
+  height: 109%;
+  overflow: visible !important;
+  pointer-events: none;
+}
+
+.status-claus-tree-dimmer {
+  fill: rgba(255, 255, 255, 0.9);
+}
+
+.status-claus-game-active .status-claus-tree-host .availability-time-line-graphic,
+.status-claus-game-active .status-claus-tree-host .availability-time-line-graphic * {
+  pointer-events: none !important;
+}
+
+.status-claus-tree-host .uptime-day.status-claus-status-twinkle {
+  animation: status-claus-status-twinkle var(--twinkle-duration, 3.4s)
+    ease-in-out var(--twinkle-delay, 0s) infinite;
+}
+
+@keyframes status-claus-status-twinkle {
+  0%, 65%, 100% { opacity: 0.8; filter: brightness(1); }
+  80% { opacity: 1; filter: brightness(1.6) drop-shadow(0 0 2px rgba(254, 240, 138, 0.8)); }
+}
+
+.status-claus-tree-loading {
+  position: absolute;
+  top: 52%;
+  left: 50%;
+  z-index: 13;
+  box-sizing: border-box;
+  width: min(240px, 75%);
+  aspect-ratio: 1;
+  display: grid;
+  place-items: center;
+  color: #fef9c3;
+  background: radial-gradient(circle, rgba(20, 83, 45, 0.96) 0 43%, transparent 44%);
+  font: 800 15px/1.45 system-ui, sans-serif;
+  text-align: center;
+  transform: translate(-50%, -50%);
+  pointer-events: none;
+}
+
+.status-claus-loading-wreath {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 3px 3px rgba(15, 23, 42, 0.4));
+  animation: status-claus-wreath-spin 4.5s linear infinite;
+}
+
+.status-claus-loading-label {
+  position: relative;
+  max-width: 55%;
+  text-shadow: 0 2px 3px #052e16;
+}
+
+@keyframes status-claus-wreath-spin {
+  to { transform: rotate(360deg); }
+}
+
+.status-claus-tree-loading[hidden] {
+  display: none;
+}
+
+.status-claus-tree-star {
+  --star-rotation: 0deg;
+  position: absolute;
+  top: 2%;
+  left: 50%;
+  z-index: 11;
+  color: #facc15;
+  font-size: 38px;
+  line-height: 1;
+  text-shadow:
+    0 0 2px #854d0e,
+    0 2px 4px rgba(0, 0, 0, 0.3);
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transform: translate(-50%, -50%) rotate(var(--star-rotation));
+  transform-origin: center;
+  user-select: none;
+  will-change: transform;
+}
+
+.status-claus-tree-star:focus-visible {
+  outline: 3px solid #166534;
+  outline-offset: 3px;
+}
+
+.status-claus-tree-star[aria-disabled="true"] {
+  cursor: default;
+  pointer-events: none;
+}
+
+.status-claus-tree-target {
+  position: absolute;
+  top: 62%;
+  left: 50%;
+  z-index: 11;
+  display: none;
+  width: 84px;
+  height: 84px;
+  border-radius: 50%;
+  background: radial-gradient(
+    circle,
+    #dc2626 0 14%,
+    #fff 14% 32%,
+    #dc2626 32% 50%,
+    #fff 50% 68%,
+    #dc2626 68% 86%,
+    transparent 86%
+  );
+  box-shadow: 0 0 0 2px rgba(127, 29, 29, 0.5);
+  opacity: 0.55;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  transition:
+    opacity 120ms ease,
+    transform 120ms ease,
+    box-shadow 120ms ease;
+}
+
+.status-claus-game-active .status-claus-tree-target {
+  display: block;
+  animation: status-claus-target-roam 14s ease-in-out infinite;
+}
+
+.status-claus-tree-target-locked {
+  opacity: 0.95;
+  box-shadow:
+    0 0 0 3px #facc15,
+    0 0 16px 4px rgba(250, 204, 21, 0.85);
+  transform: translate(-50%, -50%) scale(1.15);
+}
+
+.status-claus-tree-target-hit::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  animation: status-claus-target-hit 700ms ease-out;
+}
+
+@keyframes status-claus-target-roam {
+  0%, 100% { left: 50%; top: 42%; }
+  25% { left: 64%; top: 62%; }
+  50% { left: 55%; top: 84%; }
+  75% { left: 36%; top: 70%; }
+}
+
+.status-claus-elf {
+  position: absolute;
+  top: 27%;
+  left: 50%;
+  z-index: 14;
+  width: 64px;
+  height: 80px;
+  transform: translate(-50%, -100%);
+  animation: status-claus-elf-pace 6.4s ease-in-out infinite both;
+  animation-play-state: paused;
+  cursor: crosshair;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.status-claus-game-active .status-claus-elf {
+  animation-play-state: running;
+}
+
+.status-claus-elf[aria-disabled="true"] {
+  pointer-events: none;
+  cursor: default;
+}
+
+.status-claus-elf:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 3px;
+  border-radius: 12px;
+}
+
+.status-claus-elf-art {
+  visibility: hidden;
+  display: block;
+  width: 100%;
+  height: 100%;
+  overflow: visible;
+  transform-origin: 50% 90%;
+  filter: drop-shadow(0 3px 2px rgba(15, 23, 42, 0.3));
+}
+
+.status-claus-game-active .status-claus-elf-art {
+  visibility: visible;
+  animation: status-claus-elf-dance 650ms ease-in-out infinite alternate;
+}
+
+.status-claus-elf-exploded .status-claus-elf-art {
+  visibility: hidden;
+}
+
+@keyframes status-claus-elf-dance {
+  0% { transform: rotate(-9deg) translateY(0); }
+  50% { transform: rotate(0) translateY(-5px); }
+  100% { transform: rotate(9deg) translateY(0); }
+}
+
+@keyframes status-claus-elf-pace {
+  0%, 100% { left: 50%; }
+  25% { left: 61%; }
+  75% { left: 39%; }
+}
+
+.status-claus-snowman {
+  position: absolute;
+  top: 62%;
+  z-index: 11;
+  width: 110px;
+  height: 145px;
+  overflow: hidden;
+  pointer-events: auto;
+  cursor: pointer;
+  touch-action: manipulation;
+  user-select: none;
+}
+
+.status-claus-snowman:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 2px;
+  border-radius: 12px;
+}
+
+.status-claus-snowman-reserve-count {
+  position: absolute;
+  top: 36px;
+  left: 0;
+  padding: 2px 4px;
+  border-radius: 6px;
+  color: #fff;
+  background: #991b1b;
+  font: 800 12px/1.2 system-ui, sans-serif;
+  pointer-events: none;
+}
+
+.status-claus-snowman-right .status-claus-snowman-reserve-count {
+  left: auto;
+  right: 0;
+}
+
+.status-claus-snowman-left {
+  left: 18%;
+  transform: translate(-85%, -50%);
+}
+
+.status-claus-snowman-right {
+  right: 18%;
+  transform: translate(85%, -50%);
+}
+
+.status-claus-snowman-right .status-claus-snowman-facing {
+  transform: scaleX(-1);
+}
+
+.status-claus-snowman-art {
+  display: block;
+  width: 100%;
+  height: 100%;
+  filter: drop-shadow(0 2px 2px rgba(15, 23, 42, 0.35));
+}
+
+.status-claus-snowman-arm {
+  transform-box: view-box;
+  transform-origin: 78px 92px;
+}
+
+.status-claus-snowman-sneer {
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: status-claus-snowman-sneer 650ms ease-in-out infinite alternate;
+}
+
+@keyframes status-claus-snowman-sneer {
+  to { transform: scaleY(1.4) rotate(-5deg); }
+}
+
+.status-claus-snowball {
+  appearance: none;
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 1100;
+  display: block;
+  width: 32px;
+  height: 32px;
+  min-width: 0;
+  min-height: 0;
+  margin: 0;
+  padding: 0;
+  border: 1px solid #93c5fd;
+  border-radius: 50%;
+  background: radial-gradient(circle at 30% 25%, #fff 15%, #eff6ff 45%, #93c5fd 100%);
+  box-shadow: inset -3px -3px 5px rgba(30, 64, 175, 0.2), 0 0 5px #fff;
+  cursor: crosshair;
+  pointer-events: auto;
+  touch-action: manipulation;
+  transform-origin: center;
+  will-change: transform;
+}
+
+.status-claus-snowball:focus-visible {
+  outline: 2px solid #facc15;
+  outline-offset: 2px;
+}
+
+.status-claus-snowball-burst {
+  position: fixed;
+  z-index: 1101;
+  color: #e0f2fe;
+  font: 900 40px/1.2 system-ui, sans-serif;
+  text-shadow: 0 2px 5px #0f172a;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translate(-50%, -50%);
+  animation: status-claus-snowball-burst 800ms ease-out forwards;
+}
+
+.status-claus-snowball-damage {
+  color: #f87171;
+}
+
+@keyframes status-claus-snowball-burst {
+  from { opacity: 1; transform: translate(-50%, -50%) scale(0.7); }
+  to { opacity: 0; transform: translate(-50%, -80%) scale(1.5); }
+}
+
+.status-claus-treat {
+  position: absolute;
+  /* Above the elf (z-index 14) so a treat is never hidden behind it. */
+  z-index: 15;
+  display: block;
+  width: 34px;
+  height: 34px;
+  cursor: pointer;
+  pointer-events: auto;
+  touch-action: manipulation;
+  user-select: none;
+  will-change: transform, opacity;
+}
+
+.status-claus-treat:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 2px;
+  border-radius: 50%;
+}
+
+.status-claus-treat-sway {
+  display: grid;
+  width: 100%;
+  height: 100%;
+  place-items: center;
+  animation: status-claus-treat-sway 1.6s ease-in-out var(--sway-delay) infinite alternate;
+}
+
+.status-claus-treat-glyph {
+  font-size: 28px;
+  line-height: 1;
+}
+
+.status-claus-treat-art {
+  width: 32px;
+  height: 32px;
+}
+
+.status-claus-treat-glyph,
+.status-claus-treat-art {
+  filter: drop-shadow(0 2px 2px rgba(15, 23, 42, 0.35));
+}
+
+.status-claus-treat-caught {
+  cursor: default;
+  pointer-events: none;
+}
+
+.status-claus-treat-caught .status-claus-treat-sway {
+  animation: status-claus-treat-pop 350ms ease-out forwards;
+}
+
+.status-claus-treat-points {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  color: #facc15;
+  font: 900 20px/1 system-ui, sans-serif;
+  text-shadow:
+    -1px -1px 0 #713f12,
+    1px -1px 0 #713f12,
+    -1px 1px 0 #713f12,
+    1px 1px 0 #713f12;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: status-claus-santa-points-rise 1s ease-out forwards;
+}
+
+.status-claus-fast-warning {
+  position: fixed;
+  z-index: 1001;
+  padding: 7px 14px;
+  border: 2px solid #fef08a;
+  border-radius: 999px;
+  color: #fff;
+  background: #b91c1c;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.4);
+  font: 900 16px/1.2 system-ui, sans-serif;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
+  pointer-events: none;
+  transform: translateY(-50%);
+  animation: status-claus-fast-warning-flash 300ms steps(2, jump-none) infinite;
+}
+
+.status-claus-fast-warning-left {
+  left: 12px;
+}
+
+.status-claus-fast-warning-right {
+  right: 12px;
+}
+
+.status-claus-fast-warning-super {
+  padding: 9px 18px;
+  font-size: 20px;
+  background: #7e22ce;
+  animation-duration: 180ms;
+}
+
+.status-claus-star-points {
+  position: fixed;
+  z-index: 1002;
+  color: #facc15;
+  font: 900 22px/1 system-ui, sans-serif;
+  text-shadow:
+    -1px -1px 0 #713f12,
+    1px -1px 0 #713f12,
+    -1px 1px 0 #713f12,
+    1px 1px 0 #713f12;
+  pointer-events: none;
+  animation: status-claus-star-points-rise 900ms ease-out forwards;
+}
+
+.status-claus-snow {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+.status-claus-snowflake {
+  position: absolute;
+  top: -2rem;
+  left: var(--left);
+  color: #fff;
+  font-size: var(--size);
+  line-height: 1;
+  opacity: var(--opacity);
+  text-shadow:
+    0 0 2px rgba(15, 23, 42, 0.8),
+    0 0 5px rgba(255, 255, 255, 0.9);
+  animation: status-claus-snowfall var(--duration) linear var(--delay) infinite;
+  will-change: transform;
+}
+
+.status-claus-scoreboard {
+  position: fixed;
+  right: 18px;
+  bottom: 18px;
+  z-index: 1001;
+  display: flex;
+  box-sizing: border-box;
+  flex-direction: column;
+  min-width: 164px;
+  min-height: 219.325px;
+  padding: 9px 12px 11px;
+  border: 3px solid transparent;
+  border-radius: 14px;
+  color: #fff;
+  background:
+    linear-gradient(145deg, #166534, #052e16) padding-box,
+    repeating-linear-gradient(
+      135deg,
+      #dc2626 0 7px,
+      #fff 7px 14px,
+      #15803d 14px 21px,
+      #fff 21px 28px
+    ) border-box;
+  box-shadow:
+    0 3px 12px rgba(15, 23, 42, 0.38),
+    0 0 0 2px rgba(250, 204, 21, 0.38);
+  font: 700 16px/1.2 system-ui, sans-serif;
+  text-align: center;
+}
+
+.status-claus-choir {
+  position: absolute;
+  bottom: calc(100% + 11px);
+  left: 50%;
+  width: 174px;
+  height: 138px;
+  overflow: hidden;
+  border: 3px solid #fef08a;
+  border-radius: 48% 48% 12px 12px / 18px 18px 12px 12px;
+  opacity: 0;
+  visibility: hidden;
+  pointer-events: none;
+  background:
+    radial-gradient(circle at 50% 35%, rgba(254, 240, 138, 0.9), transparent 62%),
+    linear-gradient(145deg, #fef3c7, #fecaca);
+  box-shadow:
+    0 5px 14px rgba(15, 23, 42, 0.38),
+    inset 0 0 12px rgba(127, 29, 29, 0.22);
+  transform: translate(-50%, 9px) scale(0.94);
+  transition:
+    opacity 300ms ease,
+    visibility 300ms ease,
+    transform 300ms ease;
+}
+
+.status-claus-choir-visible {
+  opacity: 1;
+  visibility: visible;
+  transform: translate(-50%, 0) scale(1);
+}
+
+.status-claus-choir-interactive {
+  cursor: crosshair;
+  pointer-events: auto;
+}
+
+.status-claus-choir-interactive:focus-visible {
+  outline: 4px solid #facc15;
+  outline-offset: 3px;
+}
+
+.status-claus-choir-image {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: center 46%;
+  filter: sepia(0.25) contrast(1.15);
+  transition: opacity 100ms ease;
+  transform-origin: 50% 100%;
+  animation: status-claus-choir-sway 1.8s ease-in-out infinite alternate;
+}
+
+.status-claus-choir-exploded {
+  overflow: visible;
+  border-color: transparent;
+  background: transparent;
+  box-shadow: none;
+}
+
+.status-claus-choir-exploded .status-claus-choir-image,
+.status-claus-choir-exploded .status-claus-choir-note {
+  opacity: 0;
+  animation: none;
+}
+
+.status-claus-choir-penalty {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  color: #ef4444;
+  font: 900 27px/1 system-ui, sans-serif;
+  white-space: nowrap;
+  text-shadow:
+    -1px -1px 0 #450a0a,
+    1px -1px 0 #450a0a,
+    -1px 1px 0 #450a0a,
+    1px 1px 0 #450a0a,
+    0 0 5px #fff;
+  pointer-events: none;
+  animation: status-claus-santa-points-rise 1s ease-out forwards;
+}
+
+.status-claus-choir-note {
+  position: absolute;
+  z-index: 1;
+  bottom: 16px;
+  color: #b91c1c;
+  font: 900 22px/1 Georgia, serif;
+  opacity: 0;
+  text-shadow: 0 1px 1px #fff, 0 0 5px #fef08a;
+  animation: status-claus-choir-note 2.4s ease-out infinite;
+}
+
+.status-claus-choir-note:nth-child(1) {
+  left: 16px;
+  animation-delay: -0.3s;
+}
+
+.status-claus-choir-note:nth-child(2) {
+  left: 76px;
+  color: #166534;
+  animation-delay: -1.1s;
+}
+
+.status-claus-choir-note:nth-child(3) {
+  right: 13px;
+  animation-delay: -1.8s;
+}
+
+@keyframes status-claus-choir-sway {
+  from {
+    transform: rotate(-1.4deg) scale(1.015);
+  }
+
+  to {
+    transform: rotate(1.4deg) scale(1.015);
+  }
+}
+
+@keyframes status-claus-choir-note {
+  0% {
+    opacity: 0;
+    transform: translateY(0) rotate(-8deg) scale(0.75);
+  }
+
+  20% {
+    opacity: 0.95;
+  }
+
+  100% {
+    opacity: 0;
+    transform: translateY(-92px) rotate(13deg) scale(1.2);
+  }
+}
+
+.status-claus-scoreboard-title {
+  min-height: 24px;
+  margin: 0 31px 5px;
+  color: #fef08a;
+  font: 800 12px/24px system-ui, sans-serif;
+  letter-spacing: 0.035em;
+  text-shadow: 0 1px 2px #713f12;
+  white-space: nowrap;
+}
+
+.status-claus-info-button,
+.status-claus-audio-toggle {
+  position: absolute;
+  top: 6px;
+  right: 7px;
+  z-index: 2;
+  display: grid;
+  width: 28px;
+  height: 28px;
+  padding: 0;
+  border: 1px solid rgba(254, 240, 138, 0.75);
+  border-radius: 50%;
+  place-items: center;
+  color: #fff;
+  background: rgba(127, 29, 29, 0.78);
+  box-shadow: 0 1px 3px rgba(15, 23, 42, 0.32);
+  font: 15px/1 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.status-claus-info-button {
+  left: 7px;
+  right: auto;
+  background: #7f1d1d;
+  font: bold 20px/1 Georgia, serif;
+}
+
+.status-claus-info-button:hover,
+.status-claus-audio-toggle:hover {
+  background: #991b1b;
+}
+
+.status-claus-info-button:focus-visible,
+.status-claus-audio-toggle:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 2px;
+}
+
+.status-claus-info-dialog {
+  position: fixed;
+  inset: 0;
+  box-sizing: border-box;
+  width: min(520px, calc(100vw - 32px));
+  max-width: none;
+  max-height: calc(100dvh - 32px);
+  margin: auto;
+  padding: 0;
+  overflow: auto;
+  border: 2px solid #facc15;
+  border-radius: 18px;
+  color: #fff;
+  background: linear-gradient(145deg, #166534, #052e16);
+  box-shadow: 0 12px 60px rgba(0, 0, 0, 0.5);
+  font: 400 15px/1.5 system-ui, sans-serif;
+  text-align: left;
+}
+
+.status-claus-info-dialog::backdrop {
+  background: rgba(3, 15, 9, 0.75);
+}
+
+.status-claus-info-content {
+  padding: 24px;
+}
+
+.status-claus-info-content h2 {
+  margin: 0 0 16px;
+  color: #fef08a;
+  font: 800 24px/1.2 system-ui, sans-serif;
+}
+
+.status-claus-info-content p {
+  margin: 0 0 14px;
+}
+
+.status-claus-info-content a {
+  color: #fef08a;
+  text-decoration: underline;
+}
+
+.status-claus-info-close {
+  margin-top: 4px;
+  padding: 8px 22px;
+  border: 1px solid #fef08a;
+  border-radius: 999px;
+  color: #713f12;
+  background: #facc15;
+  font: 800 15px/1.3 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.status-claus-info-close:hover {
+  background: #fde047;
+}
+
+.status-claus-info-content a:focus-visible,
+.status-claus-info-close:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 3px;
+}
+
+.status-claus-start-game {
+  width: 100%;
+  margin-top: 3px;
+  padding: 7px 12px;
+  border: 1px solid #fef08a;
+  border-radius: 999px;
+  color: #713f12;
+  background: #facc15;
+  font: 800 14px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.status-claus-start-game:hover:not(:disabled) {
+  background: #fde047;
+}
+
+.status-claus-start-game:disabled {
+  opacity: 0.5;
+  cursor: wait;
+}
+
+.status-claus-start-game:focus-visible {
+  outline: 3px solid #fff;
+  outline-offset: 2px;
+}
+
+.status-claus-game-stats[hidden],
+.status-claus-start-game[hidden] {
+  display: none;
+}
+
+.status-claus-timer-line {
+  margin-bottom: 3px;
+  color: #fef08a;
+  font-size: 18px;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-claus-score-line {
+  font-size: 16px;
+}
+
+.status-claus-score-counters {
+  display: grid;
+  gap: 2px;
+  margin-top: 6px;
+  padding-top: 6px;
+  border-top: 1px solid rgba(254, 240, 138, 0.55);
+  font-size: 11px;
+  font-weight: 600;
+  text-align: left;
+}
+
+.status-claus-score-counters span {
+  float: right;
+  margin-left: 10px;
+  font-variant-numeric: tabular-nums;
+}
+
+.status-claus-high-score {
+  margin-top: auto;
+  padding-top: 7px;
+  border-top: 1px solid rgba(254, 240, 138, 0.55);
+  font-size: 11px;
+  text-align: left;
+}
+
+.status-claus-high-score-heading {
+  margin-bottom: 3px;
+  color: #fef08a;
+  font-weight: 800;
+  text-align: center;
+  text-transform: uppercase;
+  letter-spacing: 0.04em;
+}
+
+.status-claus-high-score-value {
+  font-size: 14px;
+  font-weight: 800;
+  font-variant-numeric: tabular-nums;
+  text-align: center;
+}
+
+.status-claus-flyby {
+  position: fixed;
+  top: 0;
+  left: 0;
+  z-index: 999;
+  cursor: crosshair;
+  pointer-events: auto;
+  will-change: transform;
+}
+
+.status-claus-flyby:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 5px;
+}
+
+.status-claus-flyby-disabled {
+  cursor: default;
+  pointer-events: none;
+}
+
+.status-claus-flyby-image {
+  display: block;
+  width: 100%;
+  height: auto;
+  filter: drop-shadow(0 5px 6px rgba(15, 23, 42, 0.35));
+  user-select: none;
+  transform: rotate(var(--flight-angle));
+  transform-origin: center;
+}
+
+.status-claus-flyby-image-reversed {
+  transform: scaleX(-1) rotate(var(--flight-angle));
+}
+
+.status-claus-flyby-exploded {
+  cursor: default;
+  pointer-events: none;
+}
+
+.status-claus-flyby-exploded .status-claus-flyby-image {
+  opacity: 0;
+}
+
+.status-claus-explosion,
+.status-claus-explosion-spark {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  pointer-events: none;
+}
+
+.status-claus-explosion {
+  font-size: clamp(64px, 9vw, 120px);
+  line-height: 1;
+  animation: status-claus-explosion 900ms ease-out forwards;
+}
+
+.status-claus-santa-points {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  color: #facc15;
+  font: 900 26px/1 system-ui, sans-serif;
+  text-shadow:
+    -1px -1px 0 #713f12,
+    1px -1px 0 #713f12,
+    -1px 1px 0 #713f12,
+    1px 1px 0 #713f12;
+  pointer-events: none;
+  animation: status-claus-santa-points-rise 1s ease-out forwards;
+}
+
+.status-claus-santa-bonus {
+  position: absolute;
+  top: 50%;
+  left: 50%;
+  z-index: 2;
+  color: #fff;
+  font: 900 18px/1 system-ui, sans-serif;
+  text-shadow:
+    -1px -1px 0 #7f1d1d,
+    1px -1px 0 #7f1d1d,
+    -1px 1px 0 #7f1d1d,
+    1px 1px 0 #7f1d1d;
+  white-space: nowrap;
+  pointer-events: none;
+  animation: status-claus-santa-bonus-rise 1s ease-out forwards;
+}
+
+.status-claus-explosion-spark {
+  color: #facc15;
+  font-size: 22px;
+  text-shadow: 0 0 5px #dc2626;
+  animation: status-claus-explosion-spark 850ms ease-out forwards;
+}
+
+@keyframes status-claus-explosion {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) scale(0.3) rotate(-15deg);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) scale(1.8) rotate(10deg);
+  }
+}
+
+@keyframes status-claus-explosion-spark {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -50%) rotate(var(--spark-angle)) translateX(5px);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -50%) rotate(var(--spark-angle)) translateX(var(--spark-distance));
+  }
+}
+
+@keyframes status-claus-santa-points-rise {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -40%) scale(0.8);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -230%) scale(1.2);
+  }
+}
+
+@keyframes status-claus-santa-bonus-rise {
+  from {
+    opacity: 1;
+    transform: translate(-50%, 60%) scale(0.8);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -110%) scale(1.15);
+  }
+}
+
+@keyframes status-claus-target-hit {
+  0% {
+    box-shadow: 0 0 0 0 rgba(250, 204, 21, 0.95);
+  }
+
+  100% {
+    box-shadow: 0 0 0 34px rgba(250, 204, 21, 0);
+  }
+}
+
+@keyframes status-claus-treat-sway {
+  from {
+    transform: translateX(-6px) rotate(-14deg);
+  }
+
+  to {
+    transform: translateX(6px) rotate(14deg);
+  }
+}
+
+@keyframes status-claus-treat-pop {
+  to {
+    opacity: 0;
+    transform: scale(1.8);
+  }
+}
+
+@keyframes status-claus-fast-warning-flash {
+  from {
+    opacity: 1;
+  }
+
+  to {
+    opacity: 0.35;
+  }
+}
+
+@keyframes status-claus-star-points-rise {
+  from {
+    opacity: 1;
+    transform: translate(-50%, -65%) scale(0.85);
+  }
+
+  to {
+    opacity: 0;
+    transform: translate(-50%, -240%) scale(1.15);
+  }
+}
+
+@keyframes status-claus-snowfall {
+  from {
+    transform: translate3d(0, -2rem, 0) rotate(0deg);
+  }
+
+  to {
+    transform: translate3d(var(--drift), calc(100vh + 4rem), 0) rotate(360deg);
+  }
+}
+
+.status-claus-tree-trunk {
+  fill: #7c3f18;
+}
+
+.status-claus-present-red {
+  fill: #dc2626;
+}
+
+.status-claus-present-green {
+  fill: #16a34a;
+}
+
+.status-claus-present-pink {
+  fill: #db2777;
+}
+
+.status-claus-present-blue {
+  fill: #2563eb;
+}
+
+.status-claus-present-purple {
+  fill: #9333ea;
+}
+
+.status-claus-present-teal {
+  fill: #0f766e;
+}
+
+.status-claus-present-orange {
+  fill: #ea580c;
+}
+
+.status-claus-present-cyan {
+  fill: #0891b2;
+}
+
+.status-claus-present-ribbon {
+  fill: #facc15;
+}
+
+.status-claus-present-bow {
+  fill: none;
+  stroke: #facc15;
+  stroke-width: 1.5;
+  stroke-linecap: round;
+  vector-effect: non-scaling-stroke;
+}
+
+.status-claus-present {
+  cursor: pointer;
+  pointer-events: all;
+  outline: none;
+}
+
+.status-claus-present[aria-disabled="true"] {
+  cursor: default;
+  pointer-events: none;
+}
+
+.status-claus-present-lid,
+.status-claus-present-surprise {
+  transform-box: fill-box;
+  transform-origin: center;
+  transition:
+    opacity 280ms ease,
+    transform 450ms cubic-bezier(0.2, 0.8, 0.2, 1);
+}
+
+.status-claus-points {
+  fill: #facc15;
+  stroke: #713f12;
+  stroke-width: 0.35;
+  paint-order: stroke fill;
+  font: 800 4px/1 system-ui, sans-serif;
+  pointer-events: none;
+  transform-box: fill-box;
+  transform-origin: center;
+  animation: status-claus-points-rise 1.2s ease-out forwards;
+}
+
+.status-claus-present-surprise {
+  opacity: 0;
+  pointer-events: none;
+  transform: translateY(25%);
+}
+
+.status-claus-present-open .status-claus-present-lid {
+  transform: translate(-60%, 15%) rotate(-85deg);
+}
+
+.status-claus-present-open .status-claus-present-surprise {
+  opacity: 1;
+  transform: translateY(-95%);
+}
+
+.status-claus-present:focus-visible > rect:first-child {
+  filter: drop-shadow(0 0 3px #facc15);
+  stroke: #facc15;
+  stroke-width: 1;
+  vector-effect: non-scaling-stroke;
+}
+
+@keyframes status-claus-points-rise {
+  from {
+    opacity: 1;
+    transform: translateY(0) scale(0.85);
+  }
+
+  to {
+    opacity: 0;
+    transform: translateY(-250%) scale(1.15);
+  }
+}
+
+.status-claus-tree-outline {
+  fill: none;
+  stroke: rgba(20, 83, 45, 0.88);
+  stroke-width: 1.35;
+  vector-effect: non-scaling-stroke;
+  stroke-linejoin: round;
+  filter: drop-shadow(0 2px 3px rgba(15, 23, 42, 0.2));
+}
+
+@media (prefers-color-scheme: dark) {
+  .status-claus-tree-outline {
+    stroke: rgba(74, 222, 128, 0.88);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .status-claus-loading-wreath {
+    animation: none;
+  }
+
+  .status-claus-snowman-sneer,
+  .status-claus-snowball-burst {
+    animation: none;
+  }
+
+  .status-claus-game-over-panel {
+    animation: none;
+  }
+
+  .status-claus-tree-host .uptime-day.status-claus-status-twinkle {
+    animation: none;
+  }
+
+  .status-claus-snow,
+  .status-claus-flyby,
+  .status-claus-fast-warning,
+  .status-claus-game-active .status-claus-tree-target {
+    display: none;
+  }
+
+  .status-claus-choir-image,
+  .status-claus-choir-note {
+    animation: none;
+  }
+
+  .status-claus-choir-note {
+    display: none;
+  }
+
+  .status-claus-treat-sway,
+  .status-claus-elf,
+  .status-claus-game-active .status-claus-elf-art {
+    animation: none;
+  }
+}

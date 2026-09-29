@@ -1,0 +1,33 @@
+{
+  "manifest_version": 3,
+  "name": "Status Claus",
+  "version": "1.0",
+  "description": "Turns status history into a festive Christmas tree.",
+  "permissions": ["storage"],
+  "content_scripts": [
+    {
+      "matches": ["https://status.claude.com/"],
+      "css": ["styles.css"],
+      "js": ["content.js", "music.js", "flyby.js", "treats.js", "snowman.js"],
+      "run_at": "document_idle"
+    }
+  ],
+  "web_accessible_resources": [
+    {
+      "resources": [
+        "assets/angels-we-have-heard.mp3",
+        "assets/carollers.svg",
+        "assets/deck-the-halls.mp3",
+        "assets/here-we-come-a-wassailing.ogg",
+        "assets/jingle-bells.mp3",
+        "assets/game-buzzer.ogg",
+        "assets/o-tannenbaum.mp3",
+        "assets/santa-ho-ho-ho.mp3",
+        "assets/santa-sleigh.png",
+        "assets/sleigh-bells.ogg",
+        "assets/wilhelm-scream.ogg"
+      ],
+      "matches": ["https://status.claude.com/*"]
+    }
+  ]
+}
