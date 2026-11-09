@@ -71,6 +71,8 @@
   let santasSploded = 0;
   let treatsCaught = 0;
   let gameActive = false;
+  let poweredOn = true;
+  let powerButton = null;
   let spaceKeyOwner = null;
 
   document.addEventListener("keydown", (event) => {
@@ -307,7 +309,7 @@
     });
   }
 
-  function finishGame({ playBuzzer = true, sadEnding = false, reason = "time" } = {}) {
+  function finishGame({ playBuzzer = true, sadEnding = false, reason = "time", showOverlay = true } = {}) {
     if (!gameActive) {
       return;
     }
@@ -335,7 +337,7 @@
     highScore = Math.max(highScore, totalScore);
     renderHighScore();
     saveHighScore();
-    showGameOver(reason);
+    if (showOverlay) showGameOver(reason);
     if (sadEnding) {
       document.dispatchEvent(new CustomEvent("status-claus:sad-ending"));
     }
@@ -365,7 +367,7 @@
   }
 
   function startGame() {
-    if (gameActive) {
+    if (!poweredOn || gameActive) {
       return;
     }
 
@@ -450,6 +452,42 @@
     infoDialog.querySelector("h2").focus({ preventScroll: true });
   }
 
+  function togglePower() {
+    poweredOn = !poweredOn;
+    document.body.classList.toggle("status-claus-powered-off", !poweredOn);
+    powerButton.setAttribute("aria-pressed", String(poweredOn));
+    powerButton.setAttribute("aria-label", poweredOn ? "Turn Status Claus off" : "Turn Status Claus on");
+    powerButton.title = poweredOn ? "Turn Status Claus off" : "Turn Status Claus on";
+    document.dispatchEvent(new CustomEvent("status-claus:power-state", {
+      detail: { enabled: poweredOn }
+    }));
+
+    if (!poweredOn) {
+      spaceKeyOwner = null;
+      finishGame({ playBuzzer: false, showOverlay: false });
+      hideGameOver();
+      infoDialog?.close();
+      gameStats.hidden = true;
+      document.querySelectorAll(`.${HOST_CLASS}`).forEach((host) => {
+        host.classList.remove(HOST_CLASS);
+        for (const element of Array.from(host.children)) {
+          if (Array.from(element.classList).some((name) => name.startsWith("status-claus-"))) {
+            element.remove();
+          }
+        }
+      });
+      document.querySelectorAll(`.${SNOW_CLASS}, .status-claus-star-points, .status-claus-points`).forEach((element) => element.remove());
+      document.querySelectorAll(".status-claus-status-twinkle").forEach((bar) => {
+        bar.classList.remove("status-claus-status-twinkle");
+        bar.style.removeProperty("--twinkle-delay");
+        bar.style.removeProperty("--twinkle-duration");
+      });
+    } else {
+      addTreeOverlay();
+    }
+    powerButton.focus({ preventScroll: true });
+  }
+
   function addScoreboard() {
     if (scoreboard?.isConnected) {
       return;
@@ -531,12 +569,26 @@
     highScoreValue.classList.add("status-claus-high-score-value");
     highScorePanel.append(highScoreHeading, highScoreValue);
 
+    powerButton = document.createElement("button");
+    powerButton.type = "button";
+    powerButton.classList.add("status-claus-power-toggle");
+    powerButton.setAttribute("aria-pressed", "true");
+    powerButton.setAttribute("aria-label", "Turn Status Claus off");
+    powerButton.title = "Turn Status Claus off";
+    powerButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 3v9M6.3 5.8a9 9 0 1 0 11.4 0"/></svg>';
+    powerButton.addEventListener("click", togglePower);
+
+    const controls = document.createElement("div");
+    controls.classList.add("status-claus-controls");
+    controls.append(powerButton);
+
     scoreboard.append(
       scoreboardTitle,
       infoButton,
       startGameButton,
       gameStats,
-      highScorePanel
+      highScorePanel,
+      controls
     );
     document.body.append(scoreboard);
     document.dispatchEvent(new CustomEvent("status-claus:scoreboard-ready"));
@@ -1059,6 +1111,7 @@
    * The function is idempotent because Statuspage may replace parts of the DOM.
    */
   function addTreeOverlay() {
+    if (!poweredOn) return;
     const components = document.querySelector(COMPONENTS_SELECTOR);
 
     if (!components) {

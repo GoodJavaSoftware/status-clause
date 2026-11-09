@@ -16,6 +16,28 @@
     { multiplier: 5, probability: 0.05, points: 5000 }
   ];
   let gameActive = false;
+  let poweredOn = true;
+  const timers = new Set();
+  function schedule(callback, delay) {
+    const timer = window.setTimeout(() => {
+      timers.delete(timer);
+      if (poweredOn) callback();
+    }, delay);
+    timers.add(timer);
+    return timer;
+  }
+  document.addEventListener("status-claus:power-state", (event) => {
+    poweredOn = event.detail?.enabled === true;
+    for (const timer of timers) window.clearTimeout(timer);
+    timers.clear();
+    document.querySelectorAll(".status-claus-flyby, .status-claus-fast-warning").forEach((element) => {
+      element.getAnimations().forEach((animation) => animation.cancel());
+      element.remove();
+    });
+    if (poweredOn && !window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
+      schedule(launchSanta, FIRST_FLIGHT_DELAY);
+    }
+  });
 
   if (window.matchMedia("(prefers-reduced-motion: reduce)").matches) {
     return;
@@ -70,7 +92,7 @@
     }
 
     const delay = randomBetween(MIN_DELAY, MAX_DELAY);
-    window.setTimeout(launchSanta, delay);
+    schedule(launchSanta, delay);
   }
 
   function chooseSpeedSetting() {
@@ -160,7 +182,7 @@
       );
     }
 
-    window.setTimeout(() => warning.remove(), FAST_WARNING_DURATION);
+    schedule(() => warning.remove(), FAST_WARNING_DURATION);
   }
 
   function launchSanta() {
@@ -192,7 +214,7 @@
 
     if (speedSetting.multiplier >= FAST_WARNING_MULTIPLIER) {
       showFastWarning(speedSetting, fliesLeftToRight, startY + sleighWidth / 4);
-      window.setTimeout(startFlight, FAST_WARNING_DURATION);
+      schedule(startFlight, FAST_WARNING_DURATION);
     } else {
       startFlight();
     }
@@ -243,7 +265,7 @@
         );
         const voiceDelay = randomBetween(earliestVoiceTime, latestVoiceTime);
 
-        voiceTimer = window.setTimeout(() => {
+        voiceTimer = schedule(() => {
           document.dispatchEvent(new CustomEvent("status-claus:ho-ho-ho"));
         }, voiceDelay);
       }
@@ -336,7 +358,7 @@
             detail: { points: speedSetting.points + bonus, bonus }
           })
         );
-        window.setTimeout(() => flight.remove(), 1_000);
+        schedule(() => flight.remove(), 1_000);
       }
 
       flight.addEventListener("click", explodeSleigh);
@@ -355,5 +377,5 @@
     }
   }
 
-  window.setTimeout(launchSanta, FIRST_FLIGHT_DELAY);
+  schedule(launchSanta, FIRST_FLIGHT_DELAY);
 })();

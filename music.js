@@ -78,7 +78,10 @@
 
   function updateAudioToggle() {
     const label = audioPausedByUser ? "Unmute audio" : "Mute audio";
-    musicButton.textContent = audioPausedByUser ? "🔇" : "🔊";
+    const soundPath = audioPausedByUser
+      ? '<path d="m17 9 5 6m0-6-5 6"/>'
+      : '<path d="M16 8a6 6 0 0 1 0 8m3-11a10 10 0 0 1 0 14"/>';
+    musicButton.innerHTML = '<svg viewBox="0 0 24 24" aria-hidden="true"><path d="M3 9h4l5-4v14l-5-4H3Z"/>' + soundPath + '</svg>';
     musicButton.setAttribute("aria-label", label);
     musicButton.setAttribute("title", label);
     musicButton.setAttribute("aria-pressed", String(audioPausedByUser));
@@ -87,8 +90,9 @@
   function attachAudioToggle() {
     const scoreboard = document.querySelector(".status-claus-scoreboard");
 
-    if (scoreboard && musicButton.parentElement !== scoreboard) {
-      scoreboard.append(musicButton);
+    const controls = scoreboard?.querySelector(".status-claus-controls");
+    if (controls && musicButton.parentElement !== controls) {
+      controls.insertBefore(musicButton, controls.querySelector(".status-claus-power-toggle"));
     }
 
     if (scoreboard && choirDisplay.parentElement !== scoreboard) {
@@ -723,7 +727,12 @@
 
   }
 
+  document.addEventListener("status-claus:power-state", (event) => {
+    if (!event.detail?.enabled) stopMusic();
+  });
+
   musicButton.addEventListener("click", () => {
+    if (document.body.classList.contains("status-claus-powered-off")) return;
     if (!audioPausedByUser) {
       stopMusic();
     } else {

@@ -1312,3 +1312,93 @@
     animation: none;
   }
 }
+
+/* Keep the icon controls together at the bottom of the scoreboard. */
+.status-claus-controls {
+  display: flex;
+  justify-content: center;
+  gap: 8px;
+  order: 10;
+  margin-top: 8px;
+}
+.status-claus-audio-toggle,
+.status-claus-power-toggle {
+  position: static;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+  width: 40px;
+  height: 40px;
+  margin: 0;
+  padding: 8px;
+  border: 1px solid #bbf7d0;
+  border-radius: 8px;
+  background: #f0fdf4;
+  color: #14532d;
+  font: 700 13px/1.2 system-ui, sans-serif;
+  cursor: pointer;
+}
+
+.status-claus-audio-toggle svg,
+.status-claus-power-toggle svg {
+  width: 22px;
+  height: 22px;
+  flex: none;
+  fill: none;
+  stroke: currentColor;
+  stroke-width: 2;
+  stroke-linecap: round;
+  stroke-linejoin: round;
+}
+
+.status-claus-power-toggle {
+  order: 10;
+  background: #14532d;
+  color: #fff;
+}
+
+.status-claus-audio-toggle:hover { background: #dcfce7; }
+.status-claus-power-toggle:hover { background: #166534; }
+.status-claus-power-toggle:focus-visible {
+  outline: 3px solid #facc15;
+  outline-offset: 2px;
+}
+
+.status-claus-powered-off .status-claus-scoreboard {
+  min-width: 0;
+  min-height: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  box-shadow: none;
+}
+
+.status-claus-powered-off .status-claus-scoreboard > :not(.status-claus-controls) {
+  display: none !important;
+}
+
+.status-claus-powered-off .status-claus-controls {
+  margin: 0;
+}
+
+.status-claus-powered-off .status-claus-audio-toggle {
+  display: none;
+}
+
+.status-claus-powered-off .status-claus-power-toggle {
+  width: 56px;
+  height: 56px;
+  flex-direction: column;
+  gap: 4px;
+  margin: 0;
+  padding: 8px;
+  border: 2px solid #64748b;
+  border-radius: 12px;
+  background: #1e293b;
+  color: #f8fafc;
+  box-shadow: 0 3px 12px rgba(15, 23, 42, 0.3);
+  font-size: 11px;
+}
+
+.status-claus-powered-off .status-claus-power-toggle:hover { background: #334155; }
