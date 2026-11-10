@@ -1,7 +1,7 @@
 {
   "manifest_version": 3,
   "name": "Status Claus",
-  "version": "1.0",
+  "version": "1.1",
   "description": "Turns status history into a festive Christmas tree on the Claude, OpenAI, and Cursor/xAI status pages.",
   "permissions": ["storage"],
   "content_scripts": [
