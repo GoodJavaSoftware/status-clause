@@ -6,6 +6,9 @@
   const FIRST_FLIGHT_DELAY = 2_500;
   const FAST_WARNING_MULTIPLIER = 2.3;
   const FAST_WARNING_DURATION = 1_500;
+  // A flight is tuned to cross about six sleigh-widths; longer or shorter
+  // crossings take proportionally longer or shorter, within limits.
+  const REFERENCE_FLIGHT_SLEIGH_WIDTHS = 6;
   const BULLSEYE_MULTIPLIER = 5;
   const SLEIGH_IMAGE_URL = chrome.runtime.getURL("assets/santa-sleigh.png");
   const SPEED_SETTINGS = [
@@ -191,7 +194,11 @@
     }
 
     const fliesLeftToRight = Math.random() >= 0.5;
-    const sleighWidth = Math.min(340, Math.max(180, window.innerWidth * 0.22));
+    // During a game the sleigh grows or shrinks with the tree it is aiming at.
+    const spriteScale = Number.parseFloat(
+      getComputedStyle(document.documentElement).getPropertyValue("--status-claus-sprite-scale")
+    ) || 1;
+    const sleighWidth = Math.min(340 * spriteScale, Math.max(140, window.innerWidth * 0.4));
     const edgePadding = 50;
     const startX = fliesLeftToRight
       ? -sleighWidth - edgePadding
@@ -243,8 +250,10 @@
       flight.append(sleigh);
       document.body.append(flight);
 
+      const travelFactor = Math.min(1.8, Math.max(0.6,
+        Math.abs(endX - startX) / sleighWidth / REFERENCE_FLIGHT_SLEIGH_WIDTHS));
       const flightDuration =
-        randomBetween(5_000, 7_000) / speedSetting.multiplier;
+        randomBetween(5_000, 7_000) * travelFactor / speedSetting.multiplier;
 
       document.dispatchEvent(
         new CustomEvent("status-claus:flyby", {

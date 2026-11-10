@@ -283,11 +283,13 @@
 
     attachElf();
     const treeBounds = tree.getBoundingClientRect();
+    // The tree may be scaled to fit the window; convert screen pixels to tree pixels.
+    const treeScale = treeBounds.width / tree.offsetWidth || 1;
     const hand = elf.querySelector(".status-claus-elf-hand").getBoundingClientRect();
     const startX = REDUCED_MOTION ? tree.clientWidth * randomBetween(0.4, 0.6)
-      : hand.left + hand.width / 2 - treeBounds.left;
+      : (hand.left + hand.width / 2 - treeBounds.left) / treeScale;
     const startY = REDUCED_MOTION ? tree.clientHeight * randomBetween(0.2, 0.45)
-      : hand.top + hand.height / 2 - treeBounds.top;
+      : (hand.top + hand.height / 2 - treeBounds.top) / treeScale;
     const fallDistance = tree.clientHeight * 1.04 - startY;
     const drift = tree.clientWidth * randomBetween(0.1, 0.9) - startX;
     const treat = chooseTreat();

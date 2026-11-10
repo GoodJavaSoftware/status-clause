@@ -2,11 +2,15 @@
   "manifest_version": 3,
   "name": "Status Claus",
   "version": "1.0",
-  "description": "Turns status history into a festive Christmas tree.",
+  "description": "Turns status history into a festive Christmas tree on the Claude, OpenAI, and Cursor/xAI status pages.",
   "permissions": ["storage"],
   "content_scripts": [
     {
-      "matches": ["https://status.claude.com/"],
+      "matches": [
+        "https://status.claude.com/",
+        "https://status.openai.com/",
+        "https://status.x.ai/"
+      ],
       "css": ["styles.css"],
       "js": ["content.js", "music.js", "flyby.js", "treats.js", "snowman.js"],
       "run_at": "document_idle"
@@ -27,7 +31,11 @@
         "assets/sleigh-bells.ogg",
         "assets/wilhelm-scream.ogg"
       ],
-      "matches": ["https://status.claude.com/*"]
+      "matches": [
+        "https://status.claude.com/*",
+        "https://status.openai.com/*",
+        "https://status.x.ai/*"
+      ]
     }
   ]
 }

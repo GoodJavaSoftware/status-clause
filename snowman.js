@@ -179,7 +179,7 @@
     const height = 30 + Math.random() * 55;
     const inset = 50 - ((height - 2) / 95) * 47;
     actor.classList.add("status-claus-snowman", left ? "status-claus-snowman-left" : "status-claus-snowman-right");
-    actor.style.top = `${height}%`;
+    actor.style.top = `calc(var(--status-claus-tree-top, 0px) + var(--status-claus-tree-span) * ${height / 100})`;
     actor.style[left ? "left" : "right"] = `${inset}%`;
     actor.setAttribute("role", "button");
     actor.setAttribute("tabindex", "0");

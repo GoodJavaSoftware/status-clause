@@ -2,7 +2,49 @@
   "use strict";
 
   const SVG_NAMESPACE = "http://www.w3.org/2000/svg";
-  const COMPONENTS_SELECTOR = ".components-container.one-column";
+  // Each supported status page names where the tree grows, its status rows and
+  // the bar chart that makes a row count, which marks are its uptime bars, and
+  // when those bars have finished loading.
+  const SITES = {
+    "status.claude.com": {
+      key: "claude",
+      hostSelector: ".components-container.one-column",
+      rowSelector: ":scope > .component-container",
+      rowChartSelector: ".uptime-90-days-wrapper",
+      barSelector: ".uptime-90-days-wrapper svg.availability-time-line-graphic rect.uptime-day",
+      barTwinkles: (bar) => statusBarShouldTwinkle(bar.getAttribute("fill")),
+      chartsAreReady: statuspageChartsAreReady
+    },
+    "status.openai.com": {
+      key: "openai",
+      hostSelector: 'div.rounded-lg.p-px:has(svg[class*="_chart"])',
+      rowSelector: ".divide-y > div",
+      // A row's own chart is its last part; the panels above it list components.
+      rowChartSelector: ':scope > div > div:last-child svg[class*="_chart"]',
+      barSelector: 'svg[class*="_chart"] rect[class*="_pill"]',
+      barTwinkles: (bar) => /_pill(DegradedPerformance|PartialOutage|FullOutage)/
+        .test(bar.getAttribute("class")),
+      chartsAreReady: barsAreReady
+    },
+    // status.cursor.com redirects here; Cursor shares this page with Grok and the xAI API.
+    "status.x.ai": {
+      key: "xai",
+      hostSelector: "main > div:has(> section)",
+      // The tree starts below the page title and incident summary.
+      treeTopSelector: ":scope > section",
+      rowSelector: ":scope > section, :scope > .bg-status-card",
+      rowChartSelector: "button.cursor-default",
+      barSelector: "button.cursor-default > span",
+      barTwinkles: (bar) => statusBarShouldTwinkle(bar.style.backgroundColor),
+      chartsAreReady: barsAreReady
+    }
+  };
+  const SITE = SITES[location.hostname];
+  if (!SITE) return;
+  const SITE_CLASS = `status-claus-site-${SITE.key}`;
+  // More rows than this make the tree too tall and busy.
+  const MAX_TREE_ROWS = 6;
+  const HIDDEN_ROW_CLASS = "status-claus-hidden-row";
   const OVERLAY_CLASS = "status-claus-tree-overlay";
   const HOST_CLASS = "status-claus-tree-host";
   const STAR_CLASS = "status-claus-tree-star";
@@ -24,7 +66,18 @@
     "Q29,47 27,45 Q35,38 40,25",
     "Q38,28 37,27 Q46,17 50,2 Z"
   ].join(" ");
-  const SNOWFLAKE_COUNT = 55;
+  // 55 flakes looked right on a 1440 × 900 window; other windows keep that density.
+  const SNOWFLAKES_PER_PIXEL = 55 / (1_440 * 900);
+  // The scoreboard and choir are full size on a 1500 × 850 window.
+  const UI_REFERENCE_WIDTH = 1_500;
+  const UI_REFERENCE_HEIGHT = 850;
+  const UI_SCALE_RANGE = [0.7, 1.75];
+  // During a game the tree grows or shrinks to fill the window, within these limits.
+  const TREE_SCALE_RANGE = [0.45, 2.5];
+  const TREE_FIT_MARGIN = 24;
+  // The star pokes above the tree and the trunk and presents hang 9% below it.
+  const STAR_OVERHANG = 24;
+  const TREE_BASE_ALLOWANCE = 1.09;
   const GAME_DURATION_MILLISECONDS = 60 * 1_000;
   const HIGH_SCORE_KEY = "statusClausHighScores";
   // Read the previous storage key so existing players retain their high scores.
@@ -126,6 +179,107 @@
   let highScoreValue = null;
   let gameOverOverlay = null;
   let gameOverTimer = null;
+  let fittedHost = null;
+  let fittedHostMargin = 0;
+
+  function clamp(value, [minimum, maximum]) {
+    return Math.min(maximum, Math.max(minimum, value));
+  }
+
+  function setRootScale(name, value) {
+    const root = document.documentElement;
+    const text = String(Math.round(value * 1_000) / 1_000);
+    if (root.style.getPropertyValue(name) !== text) root.style.setProperty(name, text);
+  }
+
+  /** Sizes the scoreboard, choir, and warnings to the window. */
+  function updateUiScale() {
+    setRootScale("--status-claus-ui-scale", clamp(Math.min(
+      window.innerWidth / UI_REFERENCE_WIDTH,
+      window.innerHeight / UI_REFERENCE_HEIGHT
+    ), UI_SCALE_RANGE));
+  }
+
+  /**
+   * Scales the tree so the whole game fits on screen, clear of the scoreboard.
+   * A transform leaves the page layout alone, so the margin below the tree is
+   * adjusted to keep the content underneath from overlapping or leaving a gap.
+   */
+  function fitTreeToWindow() {
+    const host = document.querySelector(`.${HOST_CLASS}`);
+    if (!gameActive || !host) return;
+
+    if (fittedHost !== host) {
+      restoreTreeSize();
+      fittedHost = host;
+      fittedHostMargin = Number.parseFloat(getComputedStyle(host).marginBottom) || 0;
+      treeResizeObserver.observe(host);
+    }
+
+    const treeTop = Number.parseFloat(host.style.getPropertyValue("--status-claus-tree-top")) || 0;
+    const treeHeight = host.offsetHeight - treeTop;
+    const headerHeight = pinnedHeaderHeight();
+    const scoreboardWidth = scoreboard?.getBoundingClientRect().width ?? 0;
+    const availableWidth = window.innerWidth - 2 * (scoreboardWidth + TREE_FIT_MARGIN);
+    const availableHeight = window.innerHeight - headerHeight - 2 * TREE_FIT_MARGIN - STAR_OVERHANG;
+    const scale = clamp(Math.min(
+      availableWidth / host.offsetWidth,
+      availableHeight / (treeHeight * TREE_BASE_ALLOWANCE)
+    ), TREE_SCALE_RANGE);
+
+    host.style.setProperty("--status-claus-tree-scale", String(scale));
+    host.style.marginBottom = `${fittedHostMargin + treeHeight * (scale - 1)}px`;
+    setRootScale("--status-claus-sprite-scale", scale);
+
+    const overlay = host.querySelector(`:scope > .${OVERLAY_CLASS}`);
+    if (overlay) {
+      const bounds = overlay.getBoundingClientRect();
+      const visibleHeight = window.innerHeight - headerHeight;
+      window.scrollBy({
+        top: bounds.top - headerHeight - STAR_OVERHANG / 2 - (visibleHeight - bounds.height) / 2,
+        behavior: "instant"
+      });
+    }
+  }
+
+  /** Measures a sticky or fixed page header (such as xAI's) that would cover the star. */
+  function pinnedHeaderHeight() {
+    for (const element of document.elementsFromPoint(window.innerWidth / 2, 1)) {
+      for (let current = element; current && current !== document.body; current = current.parentElement) {
+        const { position } = getComputedStyle(current);
+        if (position !== "fixed" && position !== "sticky") continue;
+        // A passing sleigh or other Status Claus layer is not part of the page.
+        if (Array.from(current.classList).some((name) => name.startsWith("status-claus-"))) break;
+        const bounds = current.getBoundingClientRect();
+        // Full-window layers are backdrops, not headers.
+        return bounds.top <= 0 && bounds.height < window.innerHeight * 0.3 ? bounds.bottom : 0;
+      }
+    }
+    return 0;
+  }
+
+  function restoreTreeSize() {
+    treeResizeObserver.disconnect();
+    fittedHost?.style.removeProperty("--status-claus-tree-scale");
+    fittedHost?.style.removeProperty("margin-bottom");
+    fittedHost = null;
+    setRootScale("--status-claus-sprite-scale", 1);
+  }
+
+  // Re-fit when the page changes the tree's rows mid-game, such as a new incident.
+  // The scale transform and margin do not change the observed size, so this cannot loop.
+  const treeResizeObserver = new ResizeObserver(() => fitTreeToWindow());
+
+  let resizeFrame = null;
+  window.addEventListener("resize", () => {
+    if (resizeFrame !== null) return;
+    resizeFrame = window.requestAnimationFrame(() => {
+      resizeFrame = null;
+      updateUiScale();
+      updateSnowfallDensity();
+      fitTreeToWindow();
+    });
+  });
 
   function hideGameOver() {
     window.clearTimeout(gameOverTimer);
@@ -324,6 +478,7 @@
     document.querySelectorAll(".status-claus-points, .status-claus-star-points")
       .forEach((label) => label.remove());
     setGameInteractionState();
+    restoreTreeSize();
     document.dispatchEvent(
       new CustomEvent("status-claus:game-state", {
         detail: { active: false }
@@ -371,7 +526,7 @@
       return;
     }
 
-    const components = document.querySelector(COMPONENTS_SELECTOR);
+    const components = document.querySelector(SITE.hostSelector);
     if (components) updateTreeLoadingState(components);
     else setTreeReady(false);
     if (!treeReady) return;
@@ -393,6 +548,7 @@
       .forEach((label) => label.remove());
     updateScoreboard();
     setGameInteractionState();
+    fitTreeToWindow();
     document.dispatchEvent(
       new CustomEvent("status-claus:game-state", {
         detail: { active: true }
@@ -424,8 +580,8 @@
       credit.append("Created by ", link, " for fun.");
       panel.append(title, credit);
       for (const text of [
-        "Status Claus is an independent project and is not affiliated with, endorsed by, sponsored by, or supported by Anthropic.",
-        "Anthropic and Claude are trademarks of Anthropic, PBC. References to those names identify the compatible website only and do not imply endorsement.",
+        "Status Claus is an independent project and is not affiliated with, endorsed by, sponsored by, or supported by Anthropic, OpenAI, xAI, or Cursor.",
+        "Product and company names are trademarks of their respective owners. References to those names identify the compatible websites only and do not imply endorsement.",
         "For entertainment only. The decorations and game are not official service-status information.",
         "Provided as is, without warranty, under the MIT License. Third-party media retain their respective licenses."
       ]) {
@@ -468,8 +624,12 @@
       hideGameOver();
       infoDialog?.close();
       gameStats.hidden = true;
+      // Page rows carry this class too; clear it before removing Status Claus elements.
+      document.querySelectorAll(`.${HIDDEN_ROW_CLASS}`)
+        .forEach((row) => row.classList.remove(HIDDEN_ROW_CLASS));
       document.querySelectorAll(`.${HOST_CLASS}`).forEach((host) => {
         host.classList.remove(HOST_CLASS);
+        host.style.removeProperty("--status-claus-tree-top");
         for (const element of Array.from(host.children)) {
           if (Array.from(element.classList).some((name) => name.startsWith("status-claus-"))) {
             element.remove();
@@ -965,6 +1125,24 @@
     return present;
   }
 
+  function snowflakeCount() {
+    return Math.round(clamp(
+      window.innerWidth * window.innerHeight * SNOWFLAKES_PER_PIXEL,
+      [30, 160]
+    ));
+  }
+
+  /** Rebuilds the snowfall when a resize leaves it noticeably too thin or thick. */
+  function updateSnowfallDensity() {
+    const snowfall = document.querySelector(`.${SNOW_CLASS}`);
+    if (!snowfall) return;
+    const current = snowfall.childElementCount;
+    if (Math.abs(snowflakeCount() - current) > current * 0.3) {
+      snowfall.remove();
+      addSnowfall();
+    }
+  }
+
   /** Adds a decorative snowfall layer across the full browser viewport. */
   function addSnowfall() {
     if (document.querySelector(`.${SNOW_CLASS}`)) {
@@ -977,7 +1155,7 @@
 
     const flakes = document.createDocumentFragment();
 
-    for (let index = 0; index < SNOWFLAKE_COUNT; index += 1) {
+    for (let index = 0; index < snowflakeCount(); index += 1) {
       const flake = document.createElement("span");
       flake.classList.add("status-claus-snowflake");
       flake.textContent = "❄";
@@ -1013,11 +1191,9 @@
   }
 
   function updateStatusTwinkles(components) {
-    const bars = components.querySelectorAll(
-      ".uptime-90-days-wrapper svg.availability-time-line-graphic rect.uptime-day"
-    );
+    const bars = components.querySelectorAll(SITE.barSelector);
     bars.forEach((bar, index) => {
-      const twinkles = statusBarShouldTwinkle(bar.getAttribute("fill"));
+      const twinkles = SITE.barTwinkles(bar);
       const className = "status-claus-status-twinkle";
       if (twinkles && !bar.classList.contains(className)) {
         bar.style.setProperty("--twinkle-delay", `${-(index * 0.37) % 4}s`);
@@ -1027,7 +1203,12 @@
     });
   }
 
-  function uptimeChartsAreReady(components) {
+  /** Pages that render their bars in one pass are ready once a 90-day row exists. */
+  function barsAreReady(components) {
+    return components.querySelectorAll(SITE.barSelector).length >= 90;
+  }
+
+  function statuspageChartsAreReady(components) {
     const wrappers = components.querySelectorAll(".uptime-90-days-wrapper");
 
     return wrappers.length > 0 && Array.from(wrappers).every((wrapper) => {
@@ -1098,11 +1279,32 @@
       components.append(loading);
     }
 
-    const ready = uptimeChartsAreReady(components);
+    const ready = SITE.chartsAreReady(components);
     setTreeReady(ready);
     const hidden = ready;
     if (loading.hidden !== hidden) {
       loading.hidden = hidden;
+    }
+  }
+
+  /** Keeps the first few status rows that have a bar chart and hides the rest. */
+  function updateTreeRows(components) {
+    let keptRows = 0;
+    for (const row of components.querySelectorAll(SITE.rowSelector)) {
+      const keep = keptRows < MAX_TREE_ROWS && Boolean(row.querySelector(SITE.rowChartSelector));
+      if (keep) keptRows += 1;
+      if (row.classList.contains(HIDDEN_ROW_CLASS) === keep) {
+        row.classList.toggle(HIDDEN_ROW_CLASS, !keep);
+      }
+    }
+  }
+
+  /** Starts the tree below any host content that should stay undecorated. */
+  function updateTreeTop(components) {
+    const firstRow = SITE.treeTopSelector && components.querySelector(SITE.treeTopSelector);
+    const top = `${firstRow?.offsetTop ?? 0}px`;
+    if (components.style.getPropertyValue("--status-claus-tree-top") !== top) {
+      components.style.setProperty("--status-claus-tree-top", top);
     }
   }
 
@@ -1112,14 +1314,19 @@
    */
   function addTreeOverlay() {
     if (!poweredOn) return;
-    const components = document.querySelector(COMPONENTS_SELECTOR);
+    const components = document.querySelector(SITE.hostSelector);
 
     if (!components) {
       setTreeReady(false);
       return;
     }
 
+    // Next.js pages rewrite the <html> classes while hydrating, so restore ours each pass.
+    document.documentElement.classList.add(SITE_CLASS);
+    updateUiScale();
     components.classList.add(HOST_CLASS);
+    updateTreeRows(components);
+    updateTreeTop(components);
     updateTreeLoadingState(components);
     updateStatusTwinkles(components);
     addSnowfall();

@@ -1,14 +1,16 @@
 # Status Claus
 
 Status Claus is a tiny Chrome extension that outlines the component-status grid
-on [Claude Status](https://status.claude.com/) as a Christmas tree.
+on [Claude Status](https://status.claude.com/), [OpenAI Status](https://status.openai.com/),
+and [Cursor Status](https://status.cursor.com/) (which redirects to
+[status.x.ai](https://status.x.ai/)) as a Christmas tree.
 
 Created by [GoodJava Software Solutions](https://goodjava.org) for fun.
 
 Status Claus is an independent project and is not affiliated with, endorsed by,
-sponsored by, or supported by Anthropic. Anthropic and Claude are trademarks of
-Anthropic, PBC. References to those names identify the compatible website only
-and do not imply endorsement.
+sponsored by, or supported by Anthropic, OpenAI, xAI, or Cursor. Product and
+company names are trademarks of their respective owners. References to those
+names identify the compatible websites only and do not imply endorsement.
 
 For entertainment only. The decorations and game are not official service-status
 information. Provided as is, without warranty, under the MIT License.
@@ -16,7 +18,8 @@ Third-party media retain their respective licenses.
 
 The extension is intentionally small and easy to audit:
 
-- It activates only at `https://status.claude.com/`.
+- It activates only at `https://status.claude.com/`, `https://status.openai.com/`,
+  and `https://status.x.ai/`.
 - It requests only Chrome's `storage` permission, used for one local high score.
 - It makes no network requests.
 - It stores only the highest score value and transmits no data.
@@ -31,7 +34,9 @@ A Chrome Web Store release is planned. In the meantime, you can install it manua
 3. Turn on **Developer mode** in the upper-right corner.
 4. Click **Load unpacked**.
 5. Select this repository's folder (the folder containing `manifest.json`).
-6. Visit or refresh [status.claude.com](https://status.claude.com/).
+6. Visit or refresh [status.claude.com](https://status.claude.com/),
+   [status.openai.com](https://status.openai.com/), or
+   [status.x.ai](https://status.x.ai/).
 
 After changing the extension's files, return to `chrome://extensions`, click the
 reload button on the Status Claus card, and refresh the status page.
